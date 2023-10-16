@@ -4,6 +4,7 @@
 #include "window.h"
 #include "state.h"
 #include "input.h"
+#include "../graphics/renderer.h"
 
 typedef enum core_state
 {
@@ -19,6 +20,7 @@ typedef struct core
     window Window;
     input_manager InputManager;
     state_manager StateManager;
+    renderer Renderer;
 } core;
 
 void core_init(core* Core, window_config WindowConfiguration, state_desc StartState);

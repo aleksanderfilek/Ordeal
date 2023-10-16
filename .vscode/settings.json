@@ -9,6 +9,13 @@
         "gldebug,c": "c",
         "texture.h": "c",
         "gl.h": "c",
-        "vec4.h": "c"
+        "vec4.h": "c",
+        "vec2.h": "c",
+        "math.h": "c",
+        "compare": "c",
+        "tuple": "c",
+        "utility": "c",
+        "xmemory": "c",
+        "xtr1common": "c"
     }
 }

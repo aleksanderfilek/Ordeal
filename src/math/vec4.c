@@ -1,4 +1,5 @@
 #include "vec4.h"
+#include <math.h>
 
 vec4f vec4f_add(vec4f vec1, vec4f vec2)
 {

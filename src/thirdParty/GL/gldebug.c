@@ -3,7 +3,7 @@
 #include "Gl.h"
 #include<stdio.h>
 
-GLint glShaderCheckError_(GLuint shader, GLenum pname ,const char *file, int line)
+GLint internal_gl_shaderCheckError(GLuint shader, GLenum pname ,const char *file, int line)
 {
     GLint errorCode;
     glGetShaderiv(shader, pname, &errorCode);
@@ -43,7 +43,7 @@ GLint glShaderCheckError_(GLuint shader, GLenum pname ,const char *file, int lin
     return errorCode;
 }
 
-GLint glProgramCheckError_(GLuint program, GLenum pname ,const char *file, int line)
+GLint internal_glProgramCheckError(GLuint program, GLenum pname ,const char *file, int line)
 {
     GLint errorCode;
     glGetProgramiv(program, pname, &errorCode);

@@ -2,7 +2,7 @@
 #define WINDOW_H_
 
 #include "../graphics/color.h"
-#include "../types/vec2.h"
+#include "../math/vec2.h"
 #include"../thirdParty/SDL2/SDL.h"
 #include"../thirdParty/GL/Gl.h"
 #include"../thirdParty/SDL2/SDL_opengl.h"

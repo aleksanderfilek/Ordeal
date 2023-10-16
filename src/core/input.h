@@ -2,7 +2,7 @@
 #define INPUT_H_
 
 #include "inputkeys.h"
-#include "../types/vec2.h"
+#include "../math/vec2.h"
 
 #include<stdint.h>
 

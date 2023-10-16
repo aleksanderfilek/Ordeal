@@ -2,8 +2,8 @@
 #define TEXTIRE_H_
 
 #include "color.h"
-#include "../types/vec2.h"
-#include "../types/vec4.h"
+#include "../math/vec2.h"
+#include "../math/vec4.h"
 #include <stdint.h>
 
 typedef enum texture_filter_method
