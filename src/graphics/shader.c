@@ -120,12 +120,12 @@ void shader_set_uniform_vec2(shader* Shader, guid Id, vec2f Value)
         if(uniform->Id != Id)
             continue;
 
-        glUniform2fv(uniform->Loc, &Value.X);
+        glUniform2fv(uniform->Loc, 1, &Value.X);
         return;
     }
 }
 
-void shader_set_uniform_mat4(shader* Shader, guid Id, mat4 Value)
+void shader_set_uniform_vec4(shader* Shader, guid Id, vec4f Value)
 {
     for(int i = 0; i < Shader->UniformCount; i++)
     {
@@ -133,7 +133,20 @@ void shader_set_uniform_mat4(shader* Shader, guid Id, mat4 Value)
         if(uniform->Id != Id)
             continue;
 
-        glUniformMatrix4fv(uniform->Loc, 1, GL_FALSE, &Value.Column[0].X);
+        glUniform4fv(uniform->Loc, 1, &Value.X);
+        return;
+    }
+}
+
+void shader_set_uniform_mat3(shader* Shader, guid Id, mat3 Value)
+{
+    for(int i = 0; i < Shader->UniformCount; i++)
+    {
+        shader_uniform* uniform = &Shader->Uniforms[i];
+        if(uniform->Id != Id)
+            continue;
+
+        glUniformMatrix3fv(uniform->Loc, 1, GL_FALSE, &Value.Column[0].X);
         return;
     }
 }

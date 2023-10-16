@@ -4,7 +4,8 @@
 #include "shadermanager.h"
 #include "../types/guid.h"
 #include "../math/vec2.h"
-#include "../math/mat4.h"
+#include "../math/vec4.h"
+#include "../math/mat3.h"
 #include <stdint.h>
 
 typedef struct shader_uniform
@@ -26,6 +27,7 @@ void shader_destroy(shader* Shader);
 
 void shader_set_uniform_scalar(shader* Shader, guid Id, float Value);
 void shader_set_uniform_vec2(shader* Shader, guid Id, vec2f Value);
-void shader_set_uniform_mat4(shader* Shader, guid Id, mat4 Value);
+void shader_set_uniform_vec4(shader* Shader, guid Id, vec4f Value);
+void shader_set_uniform_mat3(shader* Shader, guid Id, mat3 Value);
 
 #endif
