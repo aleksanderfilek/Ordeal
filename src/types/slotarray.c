@@ -18,6 +18,11 @@ void slot_array_destroy(slot_array* Array)
     free(Array->Chunks);
 }
 
+void slot_array_clear(slot_array* Array)
+{
+    
+}
+
 uint32_t slot_array_get_slot(slot_array* Array)
 {
     uint32_t maxValue = ~0;
