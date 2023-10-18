@@ -19,6 +19,7 @@ void core_init(core* Core, window_config WindowConfiguration, state_desc StartSt
     state_manager_init(&Core->StateManager, Core);
     state_manager_set_state(&Core->StateManager, StartState);
     time_manager_init(&Core->TimeManager);
+    resource_manager_init(&Core->ResourceManager, 10);
 }
 
 void core_start(core* Core)
@@ -48,6 +49,7 @@ void core_start(core* Core)
 
 void core_destroy(core* Core)
 {
+    resource_manager_destroy(&Core->ResourceManager);
     time_manager_destroy(&Core->TimeManager);
     state_manager_destroy(&Core->StateManager);
     input_manager_destroy(&Core->InputManager);
