@@ -1,6 +1,7 @@
 #include "slotarray.h"
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 
 void slot_array_init(slot_array* Array, uint32_t Capacity)
 {
@@ -20,7 +21,8 @@ void slot_array_destroy(slot_array* Array)
 
 void slot_array_clear(slot_array* Array)
 {
-    
+    memset(Array->Chunks, 0, Array->Capacity);
+    Array->Size = 0;
 }
 
 uint32_t slot_array_get_slot(slot_array* Array)

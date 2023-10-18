@@ -17,6 +17,7 @@
         "utility": "c",
         "xmemory": "c",
         "xtr1common": "c",
-        "vector": "c"
+        "vector": "c",
+        "xlocale": "c"
     }
 }

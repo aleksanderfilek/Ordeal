@@ -5,6 +5,7 @@
 #include "state.h"
 #include "input.h"
 #include "../graphics/renderer.h"
+#include "time.h"
 
 typedef enum core_state
 {
@@ -20,6 +21,7 @@ typedef struct core
     window Window;
     input_manager InputManager;
     state_manager StateManager;
+    time_manager TimeManager;
     renderer Renderer;
 } core;
 

@@ -18,17 +18,14 @@ void core_init(core* Core, window_config WindowConfiguration, state_desc StartSt
     input_manager_init(&Core->InputManager);
     state_manager_init(&Core->StateManager, Core);
     state_manager_set_state(&Core->StateManager, StartState);
+    time_manager_init(&Core->TimeManager);
 }
 
 void core_start(core* Core)
 {
     Core->State = STATE_STARTED;
 
-    uint32_t timer = 0;
-    float elapsed_seconds = 0.0f;
     while(Core->State == STATE_STARTED) {
-        timer = SDL_GetTicks();
-
         input_manager_update(&Core->InputManager);
 
         SDL_Event event;
@@ -43,14 +40,15 @@ void core_start(core* Core)
             }
         }
         
-        state_manager_update(&Core->StateManager, elapsed_seconds);
-
-        elapsed_seconds = (float)(SDL_GetTicks() - timer)/1000.0f;
+        time_manager_update(&Core->TimeManager);
+        float elapsedSeconds = time_get_elapsed_seconds();
+        state_manager_update(&Core->StateManager, elapsedSeconds);
     }
 }
 
 void core_destroy(core* Core)
 {
+    time_manager_destroy(&Core->TimeManager);
     state_manager_destroy(&Core->StateManager);
     input_manager_destroy(&Core->InputManager);
     window_destroy(&Core->Window);
