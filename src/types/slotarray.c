@@ -36,10 +36,13 @@ uint32_t slot_array_get_slot(slot_array* Array)
             if(chunk == maxValue)
                 continue;
 
-            for(int j = 0, b = 1; j < 32; j++, b<<1)
+            for(int j = 0, b = 1; j < 32; j++)
             {
                 if(chunk & b)
+                {
+                    b = b<<1;
                     continue;
+                }
 
                 Array->Chunks[i] = chunk ^ b;
                 Array->Size++;
@@ -57,7 +60,7 @@ uint32_t slot_array_get_slot(slot_array* Array)
 void slot_array_free_slot(slot_array* Array, uint32_t SlotIndex)
 {
     if(SlotIndex >= Array->Size)
-        return 0;
+        return;
 
     uint32_t chunkIndex = SlotIndex / 32;
     uint32_t indexInChunk = SlotIndex % 32;
