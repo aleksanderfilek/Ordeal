@@ -1,6 +1,7 @@
 #ifndef MESH_H_
 #define MESH_H_
 
+#include "../types/guid.h"
 #include <stdint.h>
 
 typedef struct mesh
@@ -9,8 +10,9 @@ typedef struct mesh
     uint32_t IndiciesCount;
 } mesh;
 
-void mesh_load(mesh* Mesh, const char* Path);
-void mesh_destroy(mesh* Mesh);
+mesh* mesh_load(guid Id, const char* Path);
+void mesh_destroy(void* Mesh);
+
 void mesh_draw(mesh* Mesh);
 
 #endif

@@ -4,7 +4,7 @@
 
 int WinMain(int argc, char *argv[])
 {
-    core* core = malloc(sizeof(core));
+    core* _core = (core*)malloc(sizeof(core));
 
     {
         window_config windowConfiguration = (window_config){
@@ -20,13 +20,13 @@ int WinMain(int argc, char *argv[])
             menu_state_update,
             menu_state_close);
 
-        core_init(core, windowConfiguration, startState);
+        core_init(_core, windowConfiguration, startState);
     }
 
-    core_start(core);
-    core_destroy(core);
+    core_start(_core);
+    core_destroy(_core);
 
-    free(core);
+    free(_core);
 
     return 0;
 }

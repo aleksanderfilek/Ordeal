@@ -3,8 +3,15 @@
 
 #define RESOURCE_CAPACITY_CHUNK_SIZE 32
 
+static resource_manager* s_ResourceManager = NULL;
+
 void resource_manager_init(resource_manager* Manager, uint32_t Capacity)
 {
+    if(s_ResourceManager)
+        return;
+
+    s_ResourceManager = Manager;
+
     Manager->Capacity = Capacity;
     Manager->Size = 0;
     slot_array_init(&Manager->Slots, Capacity);
@@ -31,10 +38,10 @@ void resource_manager_set_capacity(resource_manager* Manager, uint32_t Capacity)
             if(!data->Resource)
                 continue;
 
-            if(data->AutoDestroy == 0)
+            if(data->DestroryFunc == NULL)
                 continue;
 
-            free(data->Resource);
+            data->DestroryFunc(data->Resource);
         }
     }
 
@@ -43,28 +50,28 @@ void resource_manager_set_capacity(resource_manager* Manager, uint32_t Capacity)
     Manager->Resources = realloc(Manager->Resources, Manager->Capacity * sizeof(resource_data));
 }
 
-void resource_manager_add(resource_manager* Manager, guid Id, void* Resource, uint8_t AutoDestroy)
+void resource_manager_add(guid Id, void* Resource, void (*DestroryFunc)(void*))
 {
-    uint32_t slotIndex = slot_array_get_slot(&Manager->Slots);
-    if(slotIndex >= Manager->Capacity)
+    uint32_t slotIndex = slot_array_get_slot(&s_ResourceManager->Slots);
+    if(slotIndex >= s_ResourceManager->Capacity)
     {
-        Manager->Capacity += RESOURCE_CAPACITY_CHUNK_SIZE;
-        Manager->Ids = realloc(Manager->Ids, Manager->Capacity * sizeof(guid));
-        Manager->Resources = realloc(Manager->Resources, Manager->Capacity * sizeof(resource_data));
+        s_ResourceManager->Capacity += RESOURCE_CAPACITY_CHUNK_SIZE;
+        s_ResourceManager->Ids = realloc(s_ResourceManager->Ids, s_ResourceManager->Capacity * sizeof(guid));
+        s_ResourceManager->Resources = realloc(s_ResourceManager->Resources, s_ResourceManager->Capacity * sizeof(resource_data));
     }
 
-    Manager->Size++;
-    Manager->Ids[slotIndex] = Id;
-    Manager->Resources[slotIndex] = (resource_data){ Resource, AutoDestroy };
+    s_ResourceManager->Size++;
+    s_ResourceManager->Ids[slotIndex] = Id;
+    s_ResourceManager->Resources[slotIndex] = (resource_data){ Resource, DestroryFunc };
 }
 
-void resource_manager_remove(resource_manager* Manager, guid Id)
+void resource_manager_remove(guid Id)
 {
     uint32_t slotIndex;
     uint8_t found = 0;
-    for(uint32_t i = 0; i < Manager->Size; i++)
+    for(uint32_t i = 0; i < s_ResourceManager->Size; i++)
     {
-        if(Manager->Ids[i] == Id)
+        if(s_ResourceManager->Ids[i] == Id)
         {
             found = 1;
             slotIndex = i;
@@ -77,35 +84,48 @@ void resource_manager_remove(resource_manager* Manager, guid Id)
         return;
     }
 
-    resource_data* data = &Manager->Resources[slotIndex];
-    if(data->AutoDestroy > 0)
+    resource_data* data = &s_ResourceManager->Resources[slotIndex];
+    if(data->DestroryFunc != NULL)
     {
-        free(data->Resource);
+        data->DestroryFunc(data->Resource);
     }
 
-    Manager->Size--;
-    Manager->Ids[slotIndex] = 0;
-    Manager->Resources[slotIndex] = (resource_data){ NULL, 0 };
+    s_ResourceManager->Size--;
+    s_ResourceManager->Ids[slotIndex] = 0;
+    s_ResourceManager->Resources[slotIndex] = (resource_data){ NULL, 0 };
 }
 
-void resource_manager_clear(resource_manager* Manager)
+void resource_manager_clear()
 {
-    for(uint32_t i = 0, checkedSize = 0; i < Manager->Capacity; i++)
+    for(uint32_t i = 0, checkedSize = 0; i < s_ResourceManager->Capacity; i++)
     {
-        resource_data* data = &Manager->Resources[i];
+        resource_data* data = &s_ResourceManager->Resources[i];
         if(!data->Resource)
             continue;
 
-        if(data->AutoDestroy == 0)
+        if(data->DestroryFunc == NULL)
             continue;
 
-        free(data->Resource);
+        data->DestroryFunc(data->Resource);
 
         checkedSize++;
-        if(checkedSize == Manager->Size)
+        if(checkedSize == s_ResourceManager->Size)
             break;
     }
 
-    Manager->Size = 0;
-    slot_array_clear(&Manager->Slots);
+    s_ResourceManager->Size = 0;
+    slot_array_clear(&s_ResourceManager->Slots);
+}
+
+void* resource_manager_get(guid Id)
+{
+    for(uint32_t i = 0; i < s_ResourceManager->Capacity; i++)
+    {
+        if(s_ResourceManager->Ids[i] == Id)
+        {
+            return s_ResourceManager->Resources[i].Resource;
+        }
+    }
+
+    return NULL;
 }

@@ -7,7 +7,7 @@
 typedef struct resource_data
 {
     void* Resource;
-    uint8_t AutoDestroy;
+    void (*DestroryFunc)(void*);
 } resource_data;
 
 typedef struct resource_manager
@@ -24,8 +24,9 @@ void resource_manager_destroy(resource_manager* Manager);
 
 void resource_manager_set_capacity(resource_manager* Manager, uint32_t Capacity);
 
-void resource_manager_add(resource_manager* Manager, guid Id, void* Resource, uint8_t AutoDestroy);
-void resource_manager_remove(resource_manager* Manager, guid Id);
-void resource_manager_clear(resource_manager* Manager);
+void resource_manager_add(guid Id, void* Resource, void (*DestroryFunc)(void*));
+void resource_manager_remove(guid Id);
+void resource_manager_clear();
+void* resource_manager_get(guid Id);
 
 #endif

@@ -6,6 +6,7 @@
 #include"../thirdParty/SDL2/SDL.h"
 #include"../thirdParty/GL/Gl.h"
 #include"../thirdParty/SDL2/SDL_opengl.h"
+#include "../types/event.h"
 #include<stdint.h>
 
 typedef struct window_config
@@ -24,6 +25,8 @@ typedef struct window
     SDL_Window* SdlWindow;
     SDL_Renderer* Renderer;
     SDL_GLContext GlContext;
+
+    event OnWindowSizeChanged;
 } window;
 
 void window_init(window* Window, window_config Config);

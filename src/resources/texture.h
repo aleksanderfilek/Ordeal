@@ -1,7 +1,8 @@
 #ifndef TEXTURE_H_
 #define TEXTIRE_H_
 
-#include "color.h"
+#include "../types/guid.h"
+#include "../graphics/color.h"
 #include "../math/vec2.h"
 #include "../math/vec4.h"
 #include <stdint.h>
@@ -33,8 +34,8 @@ typedef struct texture
     vec2i AtlasSize;
 } texture;
 
-void texture_load(texture* Texture, const char* Path);
-void texture_destroy(texture* Texture);
+texture* texture_load(guid Id, const char* Path);
+void texture_destroy(void* Texture);
 
 void texture_bind(texture* Texture, uint32_t SlotIndex);
 vec4f texture_get_sprite_rect(texture* Texture, int SpriteIndex);

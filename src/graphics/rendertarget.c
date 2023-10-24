@@ -3,9 +3,10 @@
 
 static uint32_t s_BindedBufferId = 0;
 
-void render_target_init(render_target* RenderTarget, vec2i Size)
+void render_target_init(render_target* RenderTarget, vec2i Size, uint8_t Depth)
 {
     RenderTarget->Size = Size;
+    RenderTarget->DepthBufferId = 0;
 
     glGenFramebuffers(1, &RenderTarget->FrameBufferId);
     gl_check_error();
@@ -21,6 +22,18 @@ void render_target_init(render_target* RenderTarget, vec2i Size)
     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, RenderTarget->BufferId, 0);
     gl_check_error();
 
+    if(Depth > 0)
+    {
+        glGenRenderbuffers(1, &RenderTarget->DepthBufferId);
+        gl_check_error();
+        glBindRenderbuffer(GL_RENDERBUFFER, RenderTarget->DepthBufferId);
+        gl_check_error();
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32F, Size.X, Size.Y);
+        gl_check_error();
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, RenderTarget->DepthBufferId);
+        gl_check_error();
+    }
+
     GLenum bufferType = GL_COLOR_ATTACHMENT0;
     glDrawBuffers(1, &bufferType);
     gl_check_error();
@@ -31,12 +44,21 @@ void render_target_init(render_target* RenderTarget, vec2i Size)
 
 void render_target_destroy(render_target* RenderTarget)
 {
+    if (RenderTarget->DepthBufferId > 0)
+    {
+        glDeleteRenderbuffers(1, &RenderTarget->DepthBufferId);
+    }
     glDeleteTextures(1, &RenderTarget->BufferId);
     glDeleteFramebuffers(1, &RenderTarget->FrameBufferId);
 }
 
 void render_target_bind(render_target* RenderTarget)
 {
+    if(RenderTarget->DepthBufferId > 0)
+        glEnable(GL_DEPTH_TEST);
+    else    
+        glDisable(GL_DEPTH_TEST);
+
     glBindFramebuffer(GL_FRAMEBUFFER, RenderTarget->FrameBufferId);
     glViewport(0, 0, RenderTarget->Size.X, RenderTarget->Size.Y);
     s_BindedBufferId = RenderTarget->FrameBufferId;
@@ -72,5 +94,5 @@ void render_target_clear(render_target* RenderTarget)
     {
         render_target_bind(RenderTarget);
     }
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | ((RenderTarget->DepthBufferId > 0)?GL_DEPTH_BUFFER_BIT:0));
 }

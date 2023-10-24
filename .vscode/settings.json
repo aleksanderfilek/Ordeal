@@ -18,6 +18,10 @@
         "xmemory": "c",
         "xtr1common": "c",
         "vector": "c",
-        "xlocale": "c"
+        "xlocale": "c",
+        "mesh.h": "c",
+        "xiosbase": "c",
+        "rendertarget.h": "c",
+        "resources.h": "c"
     }
 }

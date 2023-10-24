@@ -2,8 +2,9 @@
 #include "../thirdParty/GL/Gl.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "../core/resources.h"
 
-void mesh_load(mesh* Mesh, const char* Path)
+mesh* mesh_load(guid Id, const char* Path)
 {
     FILE* file;
     file = fopen(Path,"rb");
@@ -36,6 +37,7 @@ void mesh_load(mesh* Mesh, const char* Path)
 
     fclose(file);
 
+    mesh* Mesh = malloc(sizeof(mesh));
     Mesh->IndiciesCount = indiciesCount;
 
     glGenVertexArrays(1, &Mesh->Vao);
@@ -82,13 +84,19 @@ void mesh_load(mesh* Mesh, const char* Path)
     }
     free(buffers);
     free(indicies);
+
+    resource_manager_add(Id, Mesh, mesh_destroy);
+
+    return Mesh;
 }
 
-void mesh_destroy(mesh* Mesh)
+void mesh_destroy(void* Mesh)
 {
-    glDeleteBuffers(1, &Mesh->Vao);
-    glDeleteBuffers(1, &Mesh->Vbo);
-    glDeleteBuffers(1, &Mesh->Ebo);
+    mesh* _mesh = (mesh*)Mesh;
+    glDeleteBuffers(1, &_mesh->Vao);
+    glDeleteBuffers(1, &_mesh->Vbo);
+    glDeleteBuffers(1, &_mesh->Ebo);
+    free(_mesh);
 }
 
 void mesh_draw(mesh* Mesh)

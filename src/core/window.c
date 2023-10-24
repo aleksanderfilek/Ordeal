@@ -1,21 +1,21 @@
 #include "window.h"
+#include <stdio.h>
 
 void window_init(window* Window, window_config config)
 {
     Window->Config = config;
 
-    if(SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
-    {
-        //printf("Window: SDL_Init %s\n", SDL_GetError());
-        exit(-1);
-    }
+    // if(SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
+    // {
+    //     printf("Window: SDL_Init %s\n", SDL_GetError());
+    //     exit(-1);
+    // }
 
     Window->SdlWindow = SDL_CreateWindow(config.Title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
-        config.Size.X, config.Size.Y, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
-
+        config.Size.X, config.Size.Y, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if(!Window->SdlWindow)
     {
-        //printf("Window could not be created! SDL Error: %s\n",SDL_GetError());
+        printf("Window could not be created! SDL Error: %s\n",SDL_GetError());
         exit(-1);
     }
 
@@ -24,7 +24,7 @@ void window_init(window* Window, window_config config)
     Window->Renderer = SDL_CreateRenderer(Window->SdlWindow, - 1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if(!Window->Renderer)
     {
-        //printf("Renderer could not be created! SDL Error: %s\n",SDL_GetError());
+        printf("Renderer could not be created! SDL Error: %s\n",SDL_GetError());
         exit(-1);
     }
 
@@ -45,10 +45,14 @@ void window_init(window* Window, window_config config)
     glViewport(0, 0, config.Size.X, config.Size.Y);
 
     window_set_color(Window, config.BackgroundColor);
+
+    event_init(&Window->OnWindowSizeChanged);
 }
 
 void window_destroy(window* Window)
 {
+    event_destroy(&Window->OnWindowSizeChanged);
+
     SDL_GL_DeleteContext(Window->GlContext);
     SDL_DestroyRenderer(Window->Renderer);
     SDL_DestroyWindow(Window->SdlWindow);
@@ -56,13 +60,14 @@ void window_destroy(window* Window)
 
 void window_handle_event(window* Window, const SDL_Event* event)
 {
-    // if (window->sdlEvent.window.event == SdlWindowEVENT_RESIZED) 
-    // {
-    //     glViewport(0, 0, window->sdlEvent.window.data1, window->sdlEvent.window.data2);
-    //     window->size = (Int2){ window->sdlEvent.window.data1, window->sdlEvent.window.data2 };
-    //     void* args[2] = { &window->sdlEvent.window.data1, &window->sdlEvent.window.data2 };
-    //     EventInvoke(window->resizeEvent, window, args, 2);
-    // }
+    switch (event->window.event)
+    {
+    case SDL_WINDOWEVENT_SIZE_CHANGED:
+        Window->Config.Size = (vec2i){ event->window.data1, event->window.data2 };
+        glViewport(0, 0, Window->Config.Size.X, Window->Config.Size.Y);
+        event_broadcast(&Window->OnWindowSizeChanged, 1, &Window->Config.Size);
+        break;
+    }
 }
 
 void window_clear(window* Window)

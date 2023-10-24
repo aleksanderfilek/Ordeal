@@ -2,12 +2,13 @@
 #include "../thirdParty/GL/Gl.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "../core/resources.h"
 
 static int convert_filter_to_gl(texture_filter_method Method);
 static int convert_wrapl_to_gl(texture_wrap_method Method);
 static int convert_color_channel_to_gl(color_channel Channel);
 
-void texture_load(texture* Texture, const char* Path)
+texture* texture_load(guid Id, const char* Path)
 {
     FILE* file;
     file = fopen(Path,"rb");
@@ -28,7 +29,9 @@ void texture_load(texture* Texture, const char* Path)
     fread(pixelData, pixelDataSize, 1, file);
     fclose(file);
 
-    *Texture = (texture){
+    texture* _texture = malloc(sizeof(texture));
+
+    *_texture = (texture){
         .Size = (vec2i){width, height},
         .Channel = channel,
         .ColorSpace = colorSpace,
@@ -38,24 +41,24 @@ void texture_load(texture* Texture, const char* Path)
         .AtlasSize = (vec2i){atlasWidth, atlasHeight}
     };
 
-    glGenTextures(1, &Texture->GlId);
-    glBindTexture(GL_TEXTURE_2D, Texture->GlId);
+    glGenTextures(1, &_texture->GlId);
+    glBindTexture(GL_TEXTURE_2D, _texture->GlId);
 
-    int glFilter = convert_filter_to_gl(Texture->FilterMethod);
+    int glFilter = convert_filter_to_gl(_texture->FilterMethod);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, glFilter);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, glFilter);
     gl_check_error();
 
-    int glWrap = convert_wrapl_to_gl(Texture->WrapMethod);
+    int glWrap = convert_wrapl_to_gl(_texture->WrapMethod);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, glWrap);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, glWrap);
     gl_check_error();
 
-    int glChannel = convert_color_channel_to_gl(Texture->Channel);
-    glTexImage2D(GL_TEXTURE_2D, 0, glChannel, Texture->Size.X, 
-        Texture->Size.Y, 0, glChannel, GL_UNSIGNED_BYTE, pixelData);
+    int glChannel = convert_color_channel_to_gl(_texture->Channel);
+    glTexImage2D(GL_TEXTURE_2D, 0, glChannel, _texture->Size.X, 
+        _texture->Size.Y, 0, glChannel, GL_UNSIGNED_BYTE, pixelData);
 
-    if (Texture->GenerateMipmapsEnabled) 
+    if (_texture->GenerateMipmapsEnabled) 
     {
         glGenerateMipmap(GL_TEXTURE_2D);
         gl_check_error();
@@ -65,12 +68,18 @@ void texture_load(texture* Texture, const char* Path)
     gl_check_error();
 
     free(pixelData);
+
+    resource_manager_add(Id, _texture, texture_destroy);
+
+    return _texture;
 }
 
-void texture_destroy(texture* Texture)
+void texture_destroy(void* Texture)
 {
-    glDeleteTextures(1, &Texture->GlId);
+    texture* _texture = (texture*)Texture;
+    glDeleteTextures(1, &_texture->GlId);
     gl_check_error();
+    free(_texture);
 }
 
 void texture_bind(texture* Texture, uint32_t SlotIndex)

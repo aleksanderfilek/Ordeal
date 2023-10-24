@@ -2,8 +2,9 @@
 #include "../thirdParty/GL/Gl.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "../core/resources.h"
 
-void shader_load(shader* Shader, const char* Path)
+shader* shader_load(guid Id, const char* Path)
 {
     FILE* file;
     file = fopen(Path,"rb");
@@ -77,13 +78,14 @@ void shader_load(shader* Shader, const char* Path)
     free(vertexShader);
     free(fragmentShader);
     
-    Shader->GlId = program;
-    Shader->UniformCount = uniformCount;
-    Shader->Uniforms = malloc(sizeof(shader_uniform) * uniformCount);
-    shader_bind(Shader);
+    shader* _shader = malloc(sizeof(shader));
+    _shader->GlId = program;
+    _shader->UniformCount = uniformCount;
+    _shader->Uniforms = malloc(sizeof(shader_uniform) * uniformCount);
+    shader_bind(_shader);
     for(int i = 0; i < uniformCount; i++)
     {
-        Shader->Uniforms[i] = (shader_uniform){ 
+        _shader->Uniforms[i] = (shader_uniform){ 
             uniforms[i].Id,
             glGetUniformLocation(program, uniforms[i].Name)
         };
@@ -91,12 +93,18 @@ void shader_load(shader* Shader, const char* Path)
     }
 
     free(uniforms);
+
+    resource_manager_add(Id, _shader, shader_destroy);
+
+    return _shader;
 }
 
-void shader_destroy(shader* Shader)
+void shader_destroy(void* Shader)
 {
-    glDeleteProgram(Shader->GlId);
-    free(Shader->Uniforms);
+    shader* _shader = (shader*)Shader;
+    glDeleteProgram(_shader->GlId);
+    free(_shader->Uniforms);
+    free(_shader);
 }
 
 void shader_set_uniform_scalar(shader* Shader, guid Id, float Value)

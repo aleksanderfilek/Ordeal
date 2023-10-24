@@ -9,9 +9,10 @@ typedef struct render_target
 	vec2i Size;
 	uint32_t FrameBufferId;
 	uint32_t BufferId;
+	uint32_t DepthBufferId;
 } render_target;
 
-void render_target_init(render_target* RenderTarget, vec2i Size);
+void render_target_init(render_target* RenderTarget, vec2i Size, uint8_t Depth);
 void render_target_destroy(render_target* RenderTarget);
 
 void render_target_bind(render_target* RenderTarget);
