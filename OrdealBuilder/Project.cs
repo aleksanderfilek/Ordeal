@@ -24,7 +24,7 @@ namespace OrdealBuilder
 
     public class Project
     {
-        private static Project? _instance;
+        private static Project _instance;
         public static Project? Get() { return _instance; }
 
         private Directory? rootDirectory;
@@ -43,7 +43,16 @@ namespace OrdealBuilder
                 rootDirectory = null;
                 return;
             }
-            OpenProject(Path.GetDirectoryName(projectPath));
+
+            string? projectDirectoryPath = Path.GetDirectoryName(projectPath);
+            projectDirectoryPath = Path.Combine(projectDirectoryPath, Path.GetFileNameWithoutExtension(projectPath));
+            System.IO.Directory.CreateDirectory(projectDirectoryPath);
+
+            string projectFilePath = Path.Combine(projectDirectoryPath, Path.GetFileName(projectPath));
+            StreamWriter stream = new StreamWriter(projectFilePath);
+            stream.Close();
+
+            OpenProject(projectDirectoryPath);
         }
 
         public void OpenProject(string? projectPath)
@@ -56,6 +65,21 @@ namespace OrdealBuilder
 
             rootDirectory = new Directory(projectPath);
             OnDirectoryChanged?.Invoke(this, new DirectoryChangedArgs(rootDirectory));
+        }
+
+        public void SaveAll()
+        {
+            if(rootDirectory != null)
+            {
+                rootDirectory.Save();
+            }
+        }
+
+        public bool IsSomethingToSave()
+        {
+            if (rootDirectory == null)
+                return false;
+            return rootDirectory.IsSomethingToSave();
         }
     }
 }

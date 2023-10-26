@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace OrdealBuilder.Commands
 {
@@ -10,7 +12,14 @@ namespace OrdealBuilder.Commands
     {
         public override void Execute(object? parameter)
         {
+            var fileDialog = new System.Windows.Forms.OpenFileDialog();
+            fileDialog.Filter = "project files (*.odapro)|*.odapro";
+            fileDialog.RestoreDirectory = true;
 
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                    Project.Get().OpenProject(Path.GetDirectoryName(fileDialog.FileName));
+            }
         }
     }
 }

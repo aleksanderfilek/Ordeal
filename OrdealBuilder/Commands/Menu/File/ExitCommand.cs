@@ -11,7 +11,15 @@ namespace OrdealBuilder.Commands
     {
         public override void Execute(object? parameter)
         {
-            Application.Current.Shutdown();
+            if (Project.Get().IsSomethingToSave())
+            {
+                MessageBoxResult dr = System.Windows.MessageBox.Show("There are some modified file. Do you want save them?", "Save changes", MessageBoxButton.YesNo);
+                if (dr == MessageBoxResult.Yes)
+                {
+                    Project.Get().SaveAll();
+                }
+            }
+            System.Windows.Application.Current.Shutdown();
         }
     }
 }

@@ -21,13 +21,12 @@
                 <MenuItem Header="Export" Command="{Binding ExportCommand}"/>
             </MenuItem>
         </Menu>
-        <Grid VerticalAlignment="Stretch" Height="Auto">
-            <Grid.Resources>
-                <DataTemplate DataType="{x:Type viewmodels:TextureViewModel}">
-                    <views:TextureView />
-                </DataTemplate>
-            </Grid.Resources>
-            <DockPanel Grid.Column="0" HorizontalAlignment="Left" Width="300" Margin="3">
+        <Grid VerticalAlignment="Stretch" Height="Auto" Margin="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <DockPanel Grid.Column="0" HorizontalAlignment="Stretch">
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
                     <Button Width="20" Height="20" Margin="0,2,0,2" Click="Refresh_Click">
                         <Image Source="Images/RefreshIcon.png"/>
@@ -35,6 +34,7 @@
                 </StackPanel>
                 <views:ContentBrowser x:Name="contentBrowser"/>
             </DockPanel>
+            <views:AssetView x:Name="assetView" Grid.Column="1" Margin="2,0,0,0"/>
         </Grid>
     </DockPanel>
 </Window>

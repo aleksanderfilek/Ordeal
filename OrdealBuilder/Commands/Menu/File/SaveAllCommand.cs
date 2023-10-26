@@ -10,7 +10,7 @@ namespace OrdealBuilder.Commands
     {
         public override void Execute(object? parameter)
         {
-
+            Project.Get().SaveAll();
         }
     }
 }

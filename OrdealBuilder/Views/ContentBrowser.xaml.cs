@@ -18,8 +18,27 @@ namespace OrdealBuilder.Views
     /// <summary>
     /// Interaction logic for ContentBrowser.xaml
     /// </summary>
+    /// 
+
+    public class FileSelectedArgs : EventArgs
+    {
+        private readonly File _file;
+
+        public FileSelectedArgs(File file)
+        {
+            _file = file;
+        }
+
+        public File File
+        {
+            get { return _file; }
+        }
+    }
+
     public partial class ContentBrowser : UserControl
     {
+        public event EventHandler<FileSelectedArgs> FileSelected;
+
         public ContentBrowser()
         {
             InitializeComponent();
@@ -75,8 +94,13 @@ namespace OrdealBuilder.Views
 
         private void Item_Selected(object sender, RoutedEventArgs e)
         {
-
+            TreeViewItem item = (TreeViewItem)sender;
+            Directory? directory = Project.Get().RootDirectory;
+            File file = directory.FindFile(item.Tag.ToString());
+            if (file != null)
+            {
+                FileSelected?.Invoke(this, new FileSelectedArgs(file));
+            }
         }
-
     }
 }

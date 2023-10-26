@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Windows.Documents;
 
 namespace OrdealBuilder
 {
@@ -45,11 +46,64 @@ namespace OrdealBuilder
 
                 foreach (var filePath in filePaths)
                 {
+                    string extension = System.IO.Path.GetExtension(filePath);
+                    if(extension.Equals(".oda") || extension.Equals(".odapro"))
+                    {
+                        continue;
+                    }
+
                     File file = new File(filePath);
                     files.Add(file);
                 }
             }
             catch { }
+        }
+
+        public void Save()
+        {
+            Directories.ForEach(d => d.Save());
+            Files.ForEach(f => f.Save());
+        }
+
+        public bool IsSomethingToSave()
+        {
+            foreach(File file in files)
+            {
+                if(file.Modified)
+                {
+                    return true;
+                }
+            }
+            foreach(Directory dir in directories)
+            {
+                if(dir.IsSomethingToSave())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public File? FindFile(string filePath)
+        {
+            string fileName = System.IO.Path.GetFileNameWithoutExtension(filePath);
+            foreach (File file in files)
+            {
+                if (file.Name.Equals(fileName))
+                {
+                    return file;
+                }
+            }
+
+            foreach (Directory dir in directories)
+            {
+                if(filePath.Contains(dir.Path))
+                {
+                    return dir.FindFile(filePath);
+                }
+            }
+
+            return null;
         }
     }
 }

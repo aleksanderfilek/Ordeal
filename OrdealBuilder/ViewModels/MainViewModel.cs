@@ -36,7 +36,14 @@ namespace OrdealBuilder.ViewModels
             // tools menu commands
             ExportCommand = new ExportCommand();
 
+            mainWindow.contentBrowser.FileSelected += ContentBrowser_FileSelected;
+
             project.OnDirectoryChanged += Project_OnDirectoryChanged;
+        }
+
+        private void ContentBrowser_FileSelected(object? sender, FileSelectedArgs e)
+        {
+            mainWindow.assetView.OpenFile(e.File);
         }
 
         private void Project_OnDirectoryChanged(object? sender, DirectoryChangedArgs e)

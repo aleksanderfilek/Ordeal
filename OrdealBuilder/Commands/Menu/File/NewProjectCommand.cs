@@ -15,17 +15,12 @@ namespace OrdealBuilder.Commands
         public override void Execute(object? parameter)
         {
             var saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            saveFileDialog.Filter = "project files (*.ordpro)|*.ordpro";
+            saveFileDialog.Filter = "project files (*.odapro)|*.odapro";
             saveFileDialog.RestoreDirectory = true;
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                Stream stream;
-                if ((stream = saveFileDialog.OpenFile()) != null)
-                {
-                    stream.Close();
-                    Project.Get().NewProject(Path.GetFullPath(saveFileDialog.FileName));
-                }
+                Project.Get().NewProject(Path.GetFullPath(saveFileDialog.FileName));
             }
          }
     }

@@ -11,7 +11,7 @@ namespace OrdealBuilder
         public string Path { get; set; }
         public string Name
         {
-            get => System.IO.Path.GetFileName(Path);
+            get => System.IO.Path.GetFileNameWithoutExtension(Path);
             private set { }
         }
 

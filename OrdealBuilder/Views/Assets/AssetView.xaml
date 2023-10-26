@@ -1,0 +1,39 @@
+﻿<UserControl x:Class="OrdealBuilder.Views.AssetView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OrdealBuilder.Views"
+             xmlns:viewmodels="clr-namespace:OrdealBuilder.ViewModels"
+             xmlns:views="clr-namespace:OrdealBuilder.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.DataContext>
+        <viewmodels:AssetViewModel/>
+    </UserControl.DataContext>
+    <Grid Background="White" Margin="1">
+        <Border Background="White" BorderBrush="Black" BorderThickness="1">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal" Background="Gray">
+                    <Label Content="Name:"  FontSize="20"/>
+                    <Label Content="{Binding Name}" FontSize="20"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Background="Gray">
+                    <Label Content="Path:"  FontSize="10"/>
+                    <Label Content="{Binding Path}" Margin="5,0,0,0"  FontSize="10"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Background="Gray">
+                    <Label Content="Type:"  FontSize="10"/>
+                    <Label Content="{Binding Type}" Margin="5,0,0,0"  FontSize="10"/>
+                </StackPanel>
+                <ContentControl Content="{Binding CurrentAssetViewModel}">
+                    <ContentControl.Resources>
+                        <DataTemplate DataType="{x:Type viewmodels:TextureViewModel}">
+                            <views:TextureView/>
+                        </DataTemplate>
+                    </ContentControl.Resources>
+                </ContentControl>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

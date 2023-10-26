@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OrdealBuilder.ViewModels
+namespace OrdealBuilder
 {
-    public class TextureViewModel : ViewModelBase
+    public class TextureAsset : Asset
     {
-        public TextureViewModel() 
+        public TextureAsset(string path, AssetType type) : base(path, type)
         {
-        
+
         }
     }
 }
