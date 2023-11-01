@@ -8,24 +8,23 @@ namespace OrdealBuilder
 {
     public class File : DirectoryItem
     {
-        public bool Modified { get; set; }
+        public bool Modified { get => Asset.Modified; }
 
-        private Asset asset;
+        public Asset Asset { get; private set; }
 
-        public AssetType Type { get => asset.Type; }
+        public AssetType Type { get => Asset.Type; }
 
         public File(string path) : base(path)
         {
-            Modified = false;
-
-            asset = AssetManager.GetAsset(path);
+            Asset = AssetManager.GetAsset(path);
+            Asset.Clear();
         }
 
         public void Save()
         {
             if(Modified)
             {
-                Modified = false;
+                Asset.Save();
             }
         }
     }

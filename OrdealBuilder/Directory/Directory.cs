@@ -52,7 +52,7 @@ namespace OrdealBuilder
                         continue;
                     }
 
-                    File file = new File(filePath);
+                    File file = new File(@filePath);
                     files.Add(file);
                 }
             }

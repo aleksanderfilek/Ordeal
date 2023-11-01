@@ -9,6 +9,7 @@ namespace OrdealBuilder
 {
     public class Asset
     {
+        public bool Modified { get; set; }
         public string? Name { get; }
         public string? Path { get; }
         public AssetType Type { get; }
@@ -18,9 +19,21 @@ namespace OrdealBuilder
             Name = System.IO.Path.GetFileNameWithoutExtension(path);
             Path = System.IO.Path.ChangeExtension(path, ".oda");
             Type = type;
+        }
 
-            StreamWriter stream = new StreamWriter(Path);
-            stream.Close();
+        public virtual void Load()
+        {
+
+        }
+
+        public virtual void Save()
+        {
+
+        }
+
+        public virtual void Clear()
+        {
+
         }
     }
 }

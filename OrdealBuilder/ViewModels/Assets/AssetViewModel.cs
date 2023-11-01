@@ -14,18 +14,26 @@ namespace OrdealBuilder.ViewModels
         public string Type { get; set; }
         public string Path { get; set; }
 
+        private File? _file = null;
+
         public AssetViewModel() 
         {
         }
+
         public void OpenFile(File file)
         {
+            if(_file != null)
+            {
+                _file.Asset.Clear();
+            }
+
             switch (file.Type)
             {
                 case AssetType.Invalid:
                     CurrentAssetViewModel = null;
                     break;
                 case AssetType.Texture:
-                    CurrentAssetViewModel = new TextureViewModel() { File = file };
+                    CurrentAssetViewModel = new TextureViewModel(file);
                     break;
                 case AssetType.Mesh:
                     break;

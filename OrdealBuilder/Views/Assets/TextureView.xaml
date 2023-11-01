@@ -17,10 +17,36 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
-        <Label Grid.Column="0" Grid.Row="0" Content="Filter method:"/>
-        <ComboBox  Grid.Column="1" Grid.Row="0" />
-        <Label  Grid.Column="0" Grid.Row="1" Content="Wrap method:"/>
-        <ComboBox  Grid.Column="1" Grid.Row="1" />
+        <Label Grid.Column="0" Grid.Row="0" Content="Size:"/>
+        <Label Grid.Column="1" Grid.Row="0" Content="{Binding Size}"/>
+        <Label Grid.Column="0" Grid.Row="1" Content="Color space:"/>
+        <ComboBox  Grid.Column="1" Grid.Row="1" SelectedIndex="{Binding ColorSpaceIndex}" Margin="0,5,0,5" SelectionChanged="ColorSpaceChanged">
+            <ComboBoxItem>sRGB</ComboBoxItem>
+        </ComboBox>
+        <Label Grid.Column="0" Grid.Row="2" Content="Filter method:"/>
+        <ComboBox  Grid.Column="1" Grid.Row="2" SelectedIndex="{Binding FilterIndex}" Margin="0,5,0,5" SelectionChanged="FilterMethodChanged">
+            <ComboBoxItem>Nearest</ComboBoxItem>
+            <ComboBoxItem>Linear</ComboBoxItem>
+        </ComboBox>
+        <Label  Grid.Column="0" Grid.Row="3" Content="Wrap method:"/>
+        <ComboBox  Grid.Column="1" Grid.Row="3" SelectedIndex="{Binding WrapIndex}" Margin="0,5,0,5" SelectionChanged="WrapMethodChanged">
+            <ComboBoxItem>Repeat</ComboBoxItem>
+            <ComboBoxItem>Clamp to edge</ComboBoxItem>
+            <ComboBoxItem>Clamp to border</ComboBoxItem>
+            <ComboBoxItem>Mirrored repeat</ComboBoxItem>
+            <ComboBoxItem>Mirrored clamp to edged</ComboBoxItem>
+        </ComboBox>
+        <Label Grid.Column="0" Grid.Row="4" Content="Generate mipmap:"/>
+        <CheckBox Grid.Column="1" Grid.Row="4" IsChecked="{Binding GenerateMipmap}" VerticalAlignment="Center"  Margin="0,5,0,5" Checked="GenerateMipmapEnabled" Unchecked="GenerateMipmapDisabled"/>
+        <Label Grid.Column="0" Grid.Row="5" Content="Atlas sprite size:"/>
+        <StackPanel Grid.Column="1" Grid.Row="5" Orientation="Horizontal" Margin="0,5,0,5">
+            <TextBox Width="100" Text="{Binding AtlasWidth}" TextAlignment="Center" TextChanged="AtlasWidthChanged"/>
+            <TextBox Width="100" Text="{Binding AtlasHeight}" TextAlignment="Center" Margin="5,0,0,0" TextChanged="AtlasHeitghtChanged"/>
+        </StackPanel>
     </Grid>
 </UserControl>
