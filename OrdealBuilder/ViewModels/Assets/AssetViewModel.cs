@@ -22,11 +22,6 @@ namespace OrdealBuilder.ViewModels
 
         public void OpenFile(File file)
         {
-            if(_file != null)
-            {
-                _file.Asset.Clear();
-            }
-
             switch (file.Type)
             {
                 case AssetType.Invalid:
@@ -39,8 +34,17 @@ namespace OrdealBuilder.ViewModels
                     break;
                 case AssetType.Font:
                     break;
+                case AssetType.Shader:
+                    CurrentAssetViewModel = new ShaderViewModel(file);
+                    break;
             }
 
+            if (_file != null)
+            {
+                _file.Asset.Clear();
+            }
+
+            _file = file;
             Name = (CurrentAssetViewModel != null) ? file.Name : "";
             Type = (CurrentAssetViewModel != null) ? file.Type.ToString() : "";
             Path = (CurrentAssetViewModel != null) ? file.Path : "";

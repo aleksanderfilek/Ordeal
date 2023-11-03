@@ -21,6 +21,8 @@ void window_init(window* Window, window_config config)
 
     Window->Id = SDL_GetWindowID(Window->SdlWindow);
     
+    Window->GlContext = SDL_GL_CreateContext(Window->SdlWindow);
+
     Window->Renderer = SDL_CreateRenderer(Window->SdlWindow, - 1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if(!Window->Renderer)
     {
@@ -33,8 +35,6 @@ void window_init(window* Window, window_config config)
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 
                         SDL_GL_CONTEXT_PROFILE_CORE);
-
-    Window->GlContext = SDL_GL_CreateContext(Window->SdlWindow);
 
     SDL_GL_SetSwapInterval(1);
 

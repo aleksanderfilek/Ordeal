@@ -31,6 +31,9 @@
                         <DataTemplate DataType="{x:Type viewmodels:TextureViewModel}">
                             <views:TextureView/>
                         </DataTemplate>
+                        <DataTemplate DataType="{x:Type viewmodels:ShaderViewModel}">
+                            <views:ShaderView/>
+                        </DataTemplate>
                     </ContentControl.Resources>
                 </ContentControl>
             </StackPanel>

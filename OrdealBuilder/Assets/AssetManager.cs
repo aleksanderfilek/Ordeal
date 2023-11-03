@@ -20,6 +20,8 @@ namespace OrdealBuilder
                     return new MeshAsset(filePath, AssetType.Mesh);
                 case ".ttf":
                     return new FontAsset(filePath, AssetType.Font);
+                case ".glsl":
+                    return new ShaderAsset(filePath, AssetType.Shader);
             }
 
             return new InvalidAsset(filePath, AssetType.Invalid);

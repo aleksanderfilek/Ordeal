@@ -22,7 +22,7 @@ shader* shader_load(guid Id, const char* Path)
     fragmentShader[fragmentShaderByteSize] = '\0';
     fread(fragmentShader, sizeof(char), fragmentShaderByteSize, file);
 
-    uint32_t uniformCount, uniformNameSize, uniformGuid;
+    uint32_t uniformCount = 0, uniformNameSize, uniformGuid;
     char* uniformName = NULL;
 
     fread(&uniformCount, sizeof(uint32_t), 1, file);
@@ -54,7 +54,7 @@ shader* shader_load(guid Id, const char* Path)
     glCompileShader(vertexShaderId);
     gl_shader_check_error(vertexShaderId, GL_COMPILE_STATUS);
 
-    glAttachShader(program, GL_VERTEX_SHADER);
+    glAttachShader(program, vertexShaderId);
     gl_program_check_error(program, GL_ATTACHED_SHADERS);
 
     uint32_t fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
@@ -62,7 +62,7 @@ shader* shader_load(guid Id, const char* Path)
     glCompileShader(fragmentShaderId);
     gl_shader_check_error(fragmentShaderId, GL_COMPILE_STATUS);
 
-    glAttachShader(program, GL_FRAGMENT_SHADER);
+    glAttachShader(program, fragmentShaderId);
     gl_program_check_error(program, GL_ATTACHED_SHADERS);
 
     glLinkProgram(program);

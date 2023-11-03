@@ -11,6 +11,7 @@ namespace OrdealBuilder
         Invalid,
         Texture,
         Mesh,
-        Font
+        Font,
+        Shader
     }
 }

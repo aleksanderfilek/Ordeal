@@ -11,11 +11,13 @@ namespace OrdealBuilder
     {
         public bool Modified { get; set; }
         public string? Name { get; }
+        public string? OriginalPath { get; }
         public string? Path { get; }
         public AssetType Type { get; }
 
         public Asset(string path, AssetType type)
         {
+            OriginalPath = path;
             Name = System.IO.Path.GetFileNameWithoutExtension(path);
             Path = System.IO.Path.ChangeExtension(path, ".oda");
             Type = type;

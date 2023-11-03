@@ -97,14 +97,14 @@ namespace OrdealBuilder.ViewModels
             _asset.GenerateMipmap = (byte)((enabled)?1:0);
         }
 
-        public void AtlasWidthChanged(int width)
+        public void AtlasWidthChanged(uint width)
         {
-            _asset.AtlasWidth = (uint)width;
+            _asset.AtlasWidth = width;
         }
 
-        public void AtlasHeitghtChanged(int height)
+        public void AtlasHeitghtChanged(uint height)
         {
-            _asset.AtlasHeight = (uint)height;
+            _asset.AtlasHeight = height;
         }
         #endregion
     }

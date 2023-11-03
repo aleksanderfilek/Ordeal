@@ -10,6 +10,25 @@ namespace OrdealBuilder
     {
         public MeshAsset(string path, AssetType type) : base(path, type)
         {
+            if (!System.IO.File.Exists(Path))
+            {
+
+            }
+        }
+
+        public override void Save()
+        {
+
+        }
+
+        public override void Load()
+        {
+
+        }
+
+        public override void Clear()
+        {
+            
         }
     }
 }

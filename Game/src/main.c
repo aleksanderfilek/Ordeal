@@ -1,6 +1,7 @@
 #include "core/core.h"
 #include "states/menu/menustate.h"
 #include <stdlib.h>
+#include "resources/shader.h"
 
 int WinMain(int argc, char *argv[])
 {

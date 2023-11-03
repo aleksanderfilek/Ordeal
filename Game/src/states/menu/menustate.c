@@ -4,7 +4,8 @@
 
 void menu_state_start(state_base* State)
 {
-
+    shader* s = shader_load(guid_get("simple"), "S_Simple.oda");
+    shader_destroy(s);
 }
 
 void menu_state_update(state_base* State, float ElapsedSeconds)
