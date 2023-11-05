@@ -31,6 +31,7 @@ namespace OrdealBuilder.ViewModels
                     CurrentAssetViewModel = new TextureViewModel(file);
                     break;
                 case AssetType.Mesh:
+                    CurrentAssetViewModel = new MeshViewModel(file);
                     break;
                 case AssetType.Font:
                     break;
