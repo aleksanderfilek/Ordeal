@@ -72,11 +72,13 @@ namespace OrdealBuilder
                         case "f":
                             for (int i = 1; i < values.Length; i++)
                             {
-                                int[] vertex = new int[3];
                                 string[] inds = values[i].Split("/".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                                vertex[0] = int.Parse(inds[0], CultureInfo.InvariantCulture) - 1;
-                                vertex[1] = int.Parse(inds[1], CultureInfo.InvariantCulture) - 1;
-                                vertex[2] = int.Parse(inds[2], CultureInfo.InvariantCulture) - 1;
+                                int[] vertex = new int[inds.Length];
+                                for(int j = 0; j < inds.Length; j++)
+                                {
+                                    vertex[j] = int.Parse(inds[j], CultureInfo.InvariantCulture) - 1;
+
+                                }
                                 if(!indiciesMap.ContainsKey(values[i]))
                                     indiciesMap.Add(values[i], vertex);
                                 indicies.Add(values[i]);
@@ -89,7 +91,8 @@ namespace OrdealBuilder
                 int counter = -1;
 
                 _buffers.Add(new List<float>());
-                _buffers.Add(new List<float>());
+                if(normals.Count > 0)
+                    _buffers.Add(new List<float>());
                 _buffers.Add(new List<float>());
 
                 foreach (string index in indicies)
@@ -111,9 +114,12 @@ namespace OrdealBuilder
                     _buffers[1].Add(texCoords[inds[1]][0]);
                     _buffers[1].Add(texCoords[inds[1]][1]);
 
-                    _buffers[2].Add(normals[inds[2]][0]);
-                    _buffers[2].Add(normals[inds[2]][1]);
-                    _buffers[2].Add(normals[inds[2]][2]);
+                    if (normals.Count > 0)
+                    {
+                        _buffers[2].Add(normals[inds[2]][0]);
+                        _buffers[2].Add(normals[inds[2]][1]);
+                        _buffers[2].Add(normals[inds[2]][2]);
+                    }
 
                     generated.Add(index);
                     _indicies.Add(generated.Count - 1);
@@ -134,15 +140,18 @@ namespace OrdealBuilder
                 foreach(float value in _buffers[0])
                     binaryWriter.Write(value);
 
-                binaryWriter.Write((byte)3);
+                binaryWriter.Write((byte)2);
                 binaryWriter.Write((uint)_buffers[1].Count);
                 foreach (float value in _buffers[1])
                     binaryWriter.Write(value);
 
-                binaryWriter.Write((byte)2);
-                binaryWriter.Write((uint)_buffers[2].Count);
-                foreach (float value in _buffers[2])
-                    binaryWriter.Write(value);
+                if (_buffers.Count == 3)
+                {
+                    binaryWriter.Write((byte)3);
+                    binaryWriter.Write((uint)_buffers[2].Count);
+                    foreach (float value in _buffers[2])
+                        binaryWriter.Write(value);
+                }
 
                 binaryWriter.Write((uint)_indicies.Count);
                 foreach (int value in _indicies)
