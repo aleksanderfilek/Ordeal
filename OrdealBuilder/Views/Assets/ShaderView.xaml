@@ -18,7 +18,7 @@
                 <RowDefinition Height="160"/>
             </Grid.RowDefinitions>
             <Label Content="Vertex shader:"/>
-            <TextBox Grid.Column="1" Text="{Binding VertexShaderContent}" TextWrapping="Wrap" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" TextChanged="VertextShaderChanged"/>
+            <TextBox Grid.Column="1" Text="{Binding VertexShaderContent}" TextWrapping="Wrap" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" TextChanged="VertextShaderChanged" AcceptsReturn="True"/>
         </Grid>
         <Grid Margin="0,5,0,0">
             <Grid.ColumnDefinitions>
@@ -29,7 +29,7 @@
                 <RowDefinition Height="160"/>
             </Grid.RowDefinitions>
             <Label Content="Fragment shader:"/>
-            <TextBox Grid.Column="1" Text="{Binding FragmentShaderContent}" TextWrapping="Wrap"  ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" TextChanged="FragmentShaderChanged"/>
+            <TextBox Grid.Column="1" Text="{Binding FragmentShaderContent}" TextWrapping="Wrap"  ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" TextChanged="FragmentShaderChanged" AcceptsReturn="True"/>
         </Grid>
      </StackPanel>
 </UserControl>

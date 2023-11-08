@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../core/resources.h"
+#include "../utilities/qoi.h"
 
 static int convert_filter_to_gl(texture_filter_method Method);
 static int convert_wrapl_to_gl(texture_wrap_method Method);
@@ -24,10 +25,15 @@ texture* texture_load(guid Id, const char* Path)
     fread(&generateMipmap, sizeof(uint8_t), 1, file);
     fread(&atlasWidth, sizeof(uint32_t), 1, file);
     fread(&atlasHeight, sizeof(uint32_t), 1, file);
-    uint32_t pixelDataSize = width * height * channel;
+    uint32_t pixelDataSize = 0;
+    fread(&pixelDataSize, sizeof(uint32_t), 1, file);
     uint8_t* pixelData = malloc(pixelDataSize);
     fread(pixelData, pixelDataSize, 1, file);
     fclose(file);
+
+    uint8_t* decodedPixelData = qoi_decode(pixelData, pixelDataSize, width, height, channel);
+    free(pixelData);
+
 
     texture* _texture = malloc(sizeof(texture));
 
@@ -42,7 +48,9 @@ texture* texture_load(guid Id, const char* Path)
     };
 
     glGenTextures(1, &_texture->GlId);
+    gl_check_error();
     glBindTexture(GL_TEXTURE_2D, _texture->GlId);
+    gl_check_error();
 
     int glFilter = convert_filter_to_gl(_texture->FilterMethod);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, glFilter);
@@ -56,7 +64,7 @@ texture* texture_load(guid Id, const char* Path)
 
     int glChannel = convert_color_channel_to_gl(_texture->Channel);
     glTexImage2D(GL_TEXTURE_2D, 0, glChannel, _texture->Size.X, 
-        _texture->Size.Y, 0, glChannel, GL_UNSIGNED_BYTE, pixelData);
+        _texture->Size.Y, 0, glChannel, GL_UNSIGNED_BYTE, decodedPixelData);
 
     if (_texture->GenerateMipmapsEnabled) 
     {
@@ -67,7 +75,7 @@ texture* texture_load(guid Id, const char* Path)
     glBindTexture(GL_TEXTURE_2D, 0);
     gl_check_error();
 
-    free(pixelData);
+    free(decodedPixelData);
 
     resource_manager_add(Id, _texture, texture_destroy);
 

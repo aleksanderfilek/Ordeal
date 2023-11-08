@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace OrdealBuilder
 {
@@ -91,7 +93,7 @@ namespace OrdealBuilder
             {
                 writer.WriteLine("#vertex");
                 writer.WriteLine(_vertexShaderContent);
-                writer.WriteLine("#frargment");
+                writer.WriteLine("#fragment");
                 writer.WriteLine(_fragmentShaderContent);
             }
 
@@ -127,35 +129,41 @@ namespace OrdealBuilder
         {
             List<string> uniformsList = new List<string>();
             string uniformWord = "uniform";
-            int uniformIndex = 0;
-            while (true)
+
+            string[] lines = Regex.Split(_vertexShaderContent, "\r\n|\r|\n");
+            foreach (string line in lines)
             {
-                uniformIndex = _vertexShaderContent.IndexOf(uniformWord, uniformIndex);
-                if (uniformIndex < 0)
+                string[] words = line.Split(' ');
+                if(words.Length < 3)
                 {
-                    break;
+                    continue;
                 }
 
-                int nameStartIndex = _vertexShaderContent.IndexOf(" ", uniformIndex + uniformWord.Length + 1);
-                int nameEndIndex = _vertexShaderContent.IndexOf(";", nameStartIndex);
-                string name = _vertexShaderContent.Substring(nameStartIndex + 1, nameEndIndex - nameStartIndex);
-                uniformsList.Add(name);
-            }
-
-            uniformIndex = 0;
-            while (true)
-            {
-                uniformIndex = _fragmentShaderContent.IndexOf(uniformWord, uniformIndex);
-                if (uniformIndex < 0)
+                if (words[0].CompareTo(uniformWord)!=0)
                 {
-                    break;
+                    continue;
                 }
 
-                int nameStartIndex = _fragmentShaderContent.IndexOf(" ", uniformIndex + uniformWord.Length + 1);
-                int nameEndIndex = _fragmentShaderContent.IndexOf(";", nameStartIndex);
-                string name = _fragmentShaderContent.Substring(nameStartIndex + 1, nameEndIndex - nameStartIndex);
-                uniformsList.Add(name);
+                uniformsList.Add(words[2].Substring(0, words[2].Length-1));
             }
+
+            lines = Regex.Split(_fragmentShaderContent, "\r\n|\r|\n");
+            foreach (string line in lines)
+            {
+                string[] words = line.Split(' ');
+                if (words.Length < 3)
+                {
+                    continue;
+                }
+
+                if (words[0].CompareTo(uniformWord) != 0)
+                {
+                    continue;
+                }
+
+                uniformsList.Add(words[2].Substring(0, words[2].Length - 1));
+            }
+
             _uniforms = uniformsList;
         }
     }

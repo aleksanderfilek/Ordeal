@@ -6,14 +6,8 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Media.Imaging;
 using System.Drawing;
-using Microsoft.VisualBasic.ApplicationServices;
-using static System.Net.WebRequestMethods;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using System.Threading.Channels;
-using System.Windows.Markup;
-using System.Buffers.Binary;
-using System.Security.Cryptography.Pkcs;
 
 namespace OrdealBuilder
 {
@@ -188,7 +182,8 @@ namespace OrdealBuilder
                 _generateMipmap = binaryReader.ReadByte();
                 _atlasWidth = binaryReader.ReadUInt32();
                 _atlasHeight = binaryReader.ReadUInt32();
-                _pixelData = binaryReader.ReadBytes((int)(_width * _height * _channel));
+                uint pixelDataSize = binaryReader.ReadUInt32();
+                _pixelData = binaryReader.ReadBytes((int)pixelDataSize);
             }
         }
 
@@ -205,7 +200,8 @@ namespace OrdealBuilder
                 binaryWriter.Write(_generateMipmap);
                 binaryWriter.Write(_atlasWidth);
                 binaryWriter.Write(_atlasHeight);
-                binaryWriter.Write(_pixelData);
+                binaryWriter.Write((uint)_pixelData.Length);
+                binaryWriter.Write(_pixelData, 0, _pixelData.Length);
             }
             Modified = false;
         }
@@ -224,24 +220,40 @@ namespace OrdealBuilder
             _pixelData = new byte[0];
         }
 
-        private struct qoi_rgba_t
-        {
-            public byte r = 0, g = 0, b = 0, a = 0;
+        private readonly uint QOI_HEADER_SIZE = 4;
+        private readonly byte[] qoiPadding = new byte[8] { 0, 0, 0, 0, 0, 0, 0, 1 };
+        private readonly byte QOI_OP_RUN = 0xC0;
+        private readonly byte QOI_OP_INDEX = 0x00;
+        private readonly byte QOI_OP_RGBA = 0xFF;
+        private readonly byte QOI_OP_RGB = 0xFE;
+        private readonly byte QOI_OP_DIFF = 0x40;
+        private readonly byte QOI_OP_LUMA = 0x80;
 
-            public qoi_rgba_t()
+        private struct qoi_rgba
+        {
+            public byte r, g, b, a;
+
+            public qoi_rgba()
             {
-               
+                r = 0;
+                g = 0;
+                b = 0; 
+                a = 0;
             }
 
-            public uint Num()
+            public uint V()
             {
-                return ((uint)r) << 24 | ((uint)g) << 16 | ((uint)b) << 8 | ((uint)a);
+                uint v = (uint)a;
+                v |= (uint)r << 24;
+                v |= (uint)g << 16;
+                v |= (uint)b << 8;
+                return v;
             }
-        }
 
-        private int QOI_COLOR_HASH(qoi_rgba_t color)
-        {
-            return (color.r * 3 + color.g * 5 + color.b * 7 + color.a * 11);
+            public int Hash()
+            {
+                return (r * 3) + (g * 5) + (b * 7) + (a * 11);
+            }
         }
 
         private byte[] QOIEncode(Bitmap bitmap)
@@ -254,137 +266,125 @@ namespace OrdealBuilder
             Marshal.Copy(bitmapData.Scan0, rawImage, 0, length);
             bitmap.UnlockBits(bitmapData);
 
-            const uint QOI_OP_INDEX = 0x00; /* 00xxxxxx */
-            const uint QOI_OP_DIFF =  0x40; /* 01xxxxxx */
-            const uint QOI_OP_LUMA =  0x80; /* 10xxxxxx */
-            const uint QOI_OP_RUN  =  0xc0; /* 11xxxxxx */
-            const uint QOI_OP_RGB  =  0xfe; /* 11111110 */
-            const uint QOI_OP_RGBA  = 0xff; /* 11111111 */
-
-            const uint QOI_MAGIC = ((uint)'q') << 24 | ((uint)'o') << 16 | ((uint)'i') << 8 | ((uint)'f');
-            const uint QOI_HEADER_SIZE = 4;
-
-            byte[] qoi_padding = new byte[8] { 0, 0, 0, 0, 0, 0, 0, 1 };
-
-            int i, max_size, p, run;
-            int px_len, px_end, px_pos, channels;
-            byte[] bytes;
-            qoi_rgba_t[] index = new qoi_rgba_t[64];
-            qoi_rgba_t px, px_prev;
-
-            max_size = (int)(Width * Height * ((byte)Channel + 1) + QOI_HEADER_SIZE + sizeof(byte) * 8);
-
-            p = 0;
-            bytes = new byte[max_size];
-
-            BinaryPrimitives.WriteUInt32LittleEndian(bytes, QOI_MAGIC);
-
-            run = 0;
-            px_prev.r = 0;
-            px_prev.g = 0;
-            px_prev.b = 0;
-            px_prev.a = 255;
-            px = px_prev;
-
-            px_len = (int)(Width * Height * (byte)Channel);
-            px_end = px_len - (byte)Channel;
-            channels = (byte)Channel;
-
-            for (px_pos = 0; px_pos < px_len; px_pos += channels)
+            for(int i = 0; i < length; i += _channel)
             {
-                px.r = rawImage[px_pos + 0];
-                px.g = rawImage[px_pos + 1];
-                px.b = rawImage[px_pos + 2];
-
-                if (channels == 4)
-                {
-                    px.a = rawImage[px_pos + 3];
-                }
-
-                if (px.Num() == px_prev.Num())
-                {
-                    run++;
-                    if (run == 62 || px_pos == px_end)
-                    {
-                        bytes[p++] = (byte)(QOI_OP_RUN | (run - 1));
-                        run = 0;
-                    }
-                }
-                else
-                {
-                    int index_pos;
-
-                    if (run > 0)
-                    {
-                        bytes[p++] = (byte)(QOI_OP_RUN | (run - 1));
-                        run = 0;
-                    }
-
-                    index_pos = QOI_COLOR_HASH(px) % 64;
-
-                    if (index[index_pos].Num() == px.Num())
-                    {
-                        bytes[p++] = (byte)(QOI_OP_INDEX | index_pos);
-                    }
-                    else
-                    {
-                        index[index_pos] = px;
-
-                        if (px.a == px_prev.a)
-                        {
-                            sbyte vr = (sbyte)(px.r - px_prev.r);
-                            sbyte vg = (sbyte)(px.g - px_prev.g);
-                            sbyte vb = (sbyte)(px.b - px_prev.b);
-
-                            sbyte vg_r = (sbyte)(vr - vg);
-                            sbyte vg_b = (sbyte)(vb - vg);
-
-                            if (
-                                vr > -3 && vr < 2 &&
-                                vg > -3 && vg < 2 &&
-                                vb > -3 && vb < 2
-                                )
-                            {
-                                bytes[p++] = (byte)(QOI_OP_DIFF | (vr + 2) << 4 | (vg + 2) << 2 | (vb + 2));
-                            }
-                            else if (
-                                vg_r > -9 && vg_r < 8 &&
-                                vg > -33 && vg < 32 &&
-                                vg_b > -9 && vg_b < 8
-                                )
-                            {
-                                bytes[p++] = (byte)(QOI_OP_LUMA | (vg + 32));
-                                bytes[p++] = (byte)((vg_r + 8) << 4 | (vg_b + 8));
-                            }
-                            else
-                            {
-                                bytes[p++] = (byte)QOI_OP_RGB;
-                                bytes[p++] = px.r;
-                                bytes[p++] = px.g;
-                                bytes[p++] = px.b;
-                            }
-                        }
-                        else
-                        {
-                            bytes[p++] = (byte)QOI_OP_RGBA;
-                            bytes[p++] = px.r;
-                            bytes[p++] = px.g;
-                            bytes[p++] = px.b;
-                            bytes[p++] = px.a;
-                        }
-                    }
-                }
-                px_prev = px;
+                byte temp = rawImage[i + 0];
+                rawImage[i + 0] = rawImage[i + 2];
+                rawImage[i + 2] = temp;
             }
 
-            for (i = 0; i < 8; i++)
-            {
-                bytes[p++] = qoi_padding[i];
-            }
+            return Qoi.Encode(rawImage, (int)_width, (int)_height, (int)_channel);
 
-            byte[] compressedImage = new byte[p];
-            Array.Copy(bytes, compressedImage, p);
-            return compressedImage;
+            //int i, maxSize, p, run;
+            //int pxLen, pxEnd, pxPos;
+
+            //maxSize = (int)(_width * _height * (_channel + 1) + QOI_HEADER_SIZE + qoiPadding.Length);
+            //p = 0;
+            //byte[] bytes = new byte[maxSize];
+
+            //bytes[p++] = (byte)'q';
+            //bytes[p++] = (byte)'o';
+            //bytes[p++] = (byte)'i';
+            //bytes[p++] = (byte)'f';
+
+            //qoi_rgba[] index = new qoi_rgba[64];
+            //qoi_rgba px, pxPrev;
+            //run = 0;
+
+            //pxPrev.r = 0;
+            //pxPrev.g = 0;
+            //pxPrev.b = 0;
+            //pxPrev.a = 255;
+            //px = pxPrev;
+
+            //pxLen = (int)(_width * _height * _channel);
+            //pxEnd = pxLen - _channel;
+
+            //for(pxPos = 0; pxPos < pxLen; pxPos += _channel)
+            //{
+            //    px.r = rawImage[pxPos + 0];
+            //    px.g = rawImage[pxPos + 1];
+            //    px.b = rawImage[pxPos + 2];
+            //    if (_channel == 4)
+            //    {
+            //        px.a = rawImage[pxPos + 3];
+            //    }
+
+            //    if(px.V() == pxPrev.V())
+            //    {
+            //        run++;
+            //        if(run == 62 || pxPos == pxEnd)
+            //        {
+            //            bytes[p++] = (byte)(QOI_OP_RUN | (run - 1));
+            //            run = 0;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        int indexPos;
+            //        if(run > 0)
+            //        {
+            //            bytes[p++] = (byte)(QOI_OP_RUN | (run - 1));
+            //            run = 0;
+            //        }
+
+            //        indexPos = px.Hash() % 64;
+
+            //        if (index[indexPos].V() == px.V())
+            //        {
+            //            bytes[p++] = (byte)(QOI_OP_INDEX | indexPos);
+            //        }
+            //        else
+            //        {
+            //            index[indexPos] = px;
+
+            //            if(px.a == pxPrev.a)
+            //            {
+            //                int vr = px.r - pxPrev.r;
+            //                int vg = px.g - pxPrev.g;
+            //                int vb = px.b - pxPrev.b;
+
+            //                int vg_r = vr - vg;
+            //                int vg_b = vb - vg;
+
+            //                if(vr > -3 && vr < 2 && vg > -3 && vg < 2 && vb > -3 && vb < 2)
+            //                {
+            //                    bytes[p++] = (byte)(QOI_OP_DIFF | (vr + 2) << 4 | (vg + 2) << 2 | (vb + 2));
+            //                }
+            //                else if (vg_r > -9 && vg_r < 8 && vg > -33 && vg < 32 && vg_b > -9 && vg_b < 8)
+            //                {
+            //                    bytes[p++] = (byte)(QOI_OP_LUMA | (vg + 32));
+            //                    bytes[p++] = (byte)((vg_r + 8) << 4 | (vg_b + 8));
+            //                }
+            //                else
+            //                {
+            //                    bytes[p++] = QOI_OP_RGB;
+            //                    bytes[p++] = px.r;
+            //                    bytes[p++] = px.g;
+            //                    bytes[p++] = px.b;
+            //                }
+            //            }
+            //            else
+            //            {
+            //                bytes[p++] = QOI_OP_RGBA;
+            //                bytes[p++] = px.r;
+            //                bytes[p++] = px.g;
+            //                bytes[p++] = px.b;
+            //                bytes[p++] = px.a;
+            //            }
+            //        }
+            //    }
+            //    pxPrev = px;
+            //}
+
+            //for(i = 0; i < 8; i++)
+            //{
+            //    bytes[p++] = qoiPadding[i];
+            //}
+
+            //byte[] compressedImage = new byte[p];
+            //Array.Copy(bytes, compressedImage, p);
+            //return compressedImage;
         }
     }
 }
