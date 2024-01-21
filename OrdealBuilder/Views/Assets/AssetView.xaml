@@ -8,9 +8,6 @@
              xmlns:views="clr-namespace:OrdealBuilder.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.DataContext>
-        <viewmodels:AssetViewModel/>
-    </UserControl.DataContext>
     <Grid Background="White" Margin="1">
         <Border Background="White" BorderBrush="Black" BorderThickness="1">
             <StackPanel Orientation="Vertical">

@@ -15,13 +15,15 @@ namespace OrdealBuilder.ViewModels
         public ICommand OpenProjectCommand { get; }
         public ICommand SaveAllCommand { get; }
         public ICommand ExitCommand { get; }
-        public ICommand ExportCommand { get; }
+        public ICommand OpenProjectPreferencesCommand { get; }
+        public ICommand BuildCommand { get; }
+        public ICommand OpenOutputLogCommand { get; }
 
         private Project project;
 
         private MainWindow mainWindow;
 
-        public MainViewModel()
+        public MainViewModel(string? StartupProject)
         {
             mainWindow = (MainWindow)App.Current.MainWindow;
 
@@ -34,16 +36,25 @@ namespace OrdealBuilder.ViewModels
             ExitCommand = new ExitCommand();
 
             // tools menu commands
-            ExportCommand = new ExportCommand();
+            BuildCommand = new BuildCommand();
+
+            // window menu commands
+            OpenProjectPreferencesCommand = new OpenProjectPreferencesCommand();
+            OpenOutputLogCommand = new OpenOutputLogCommand();
 
             mainWindow.contentBrowser.FileSelected += ContentBrowser_FileSelected;
 
             project.OnDirectoryChanged += Project_OnDirectoryChanged;
+
+            if(StartupProject != null)
+            {
+                project.OpenProject(StartupProject);
+            }
         }
 
         private void ContentBrowser_FileSelected(object? sender, FileSelectedArgs e)
         {
-            mainWindow.assetView.OpenFile(e.File);
+            mainWindow.viewNavigator.OpenFile(e.File);
         }
 
         private void Project_OnDirectoryChanged(object? sender, DirectoryChangedArgs e)

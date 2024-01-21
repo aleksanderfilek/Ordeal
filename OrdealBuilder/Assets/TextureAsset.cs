@@ -171,6 +171,8 @@ namespace OrdealBuilder
 
         public override void Load()
         {
+            base.Load();
+
             using (BinaryReader binaryReader = new BinaryReader(System.IO.File.Open(Path, FileMode.Open)))
             {
                 _width = binaryReader.ReadUInt32();
@@ -208,6 +210,8 @@ namespace OrdealBuilder
 
         public override void Clear()
         {
+            base.Clear();
+
             _width = 0;
             _height = 0;
             _channel = 0;

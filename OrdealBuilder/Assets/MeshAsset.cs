@@ -161,6 +161,8 @@ namespace OrdealBuilder
 
         public override void Load()
         {
+            base.Load();
+
             using (BinaryReader binaryReader = new BinaryReader(System.IO.File.Open(Path, FileMode.Open)))
             {
                 uint buffersCount = binaryReader.ReadUInt32();
@@ -186,6 +188,8 @@ namespace OrdealBuilder
 
         public override void Clear()
         {
+            base.Clear();
+
             _buffers = new List<List<float>>(3);
             _indicies = new List<int>();
         }

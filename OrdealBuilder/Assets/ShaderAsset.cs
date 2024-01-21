@@ -19,7 +19,7 @@ namespace OrdealBuilder
             get => _vertexShaderContent;
             set
             {
-                if (_vertexShaderContent.CompareTo(value) != 0)
+                if (_vertexShaderContent.CompareTo(value) != 0 && !String.IsNullOrEmpty(value))
                 {
                     _vertexShaderContent = value;
                     GatherUniforms();
@@ -34,7 +34,7 @@ namespace OrdealBuilder
             get => _fragmentShaderContent;
             set
             {
-                if(_fragmentShaderContent.CompareTo(value) != 0)
+                if(_fragmentShaderContent.CompareTo(value) != 0 && !String.IsNullOrEmpty(value))
                 {
                     _fragmentShaderContent = value;
                     GatherUniforms();
@@ -102,6 +102,7 @@ namespace OrdealBuilder
 
         public override void Load()
         {
+            base.Load();
             using (BinaryReader binaryReader = new BinaryReader(System.IO.File.Open(Path, FileMode.Open)))
             {
                 uint buffer = binaryReader.ReadUInt32();
@@ -120,6 +121,7 @@ namespace OrdealBuilder
 
         public override void Clear()
         {
+            base.Clear();
             _vertexShaderContent = "";
             _fragmentShaderContent = "";
             _uniforms = new List<string>();

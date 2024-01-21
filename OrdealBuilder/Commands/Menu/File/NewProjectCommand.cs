@@ -15,7 +15,12 @@ namespace OrdealBuilder.Commands
         public override void Execute(object? parameter)
         {
             var saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            saveFileDialog.Filter = "project files (*.odapro)|*.odapro";
+            StringBuilder filterBuilder = new StringBuilder();
+            filterBuilder.Append("project files (*");
+            filterBuilder.Append(Project.ProjectExtension);
+            filterBuilder.Append("|*");
+            filterBuilder.Append(Project.ProjectExtension);
+            saveFileDialog.Filter = filterBuilder.ToString();
             saveFileDialog.RestoreDirectory = true;
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)

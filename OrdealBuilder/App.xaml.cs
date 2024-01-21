@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,9 +17,19 @@ namespace OrdealBuilder
     {
         protected override void OnStartup(StartupEventArgs e)
         {
+            string? startupProject = null;
+            if (e.Args.Length == 1)
+            {
+                FileInfo file = new FileInfo(e.Args[0]);
+                if (file.Exists) //make sure it's actually a file
+                {
+                    startupProject = file.FullName;
+                }
+            }
+            
             MainWindow = new MainWindow()
             {
-                DataContext = new MainViewModel()
+                DataContext = new MainViewModel(startupProject)
             };
             MainWindow.Show();
 

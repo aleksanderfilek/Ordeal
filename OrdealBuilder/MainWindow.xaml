@@ -7,7 +7,7 @@
         xmlns:viewmodels="clr-namespace:OrdealBuilder.ViewModels"
         xmlns:views="clr-namespace:OrdealBuilder.Views"
         mc:Ignorable="d"
-        Title="Ordeal builder" Height="450" Width="800" MinHeight="450" MinWidth="800">
+        Title="Game Editor" Height="450" Width="800" MinHeight="450" MinWidth="800" Closed="Window_Closed">
     <DockPanel VerticalAlignment="Stretch" Height="Auto">
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
@@ -18,23 +18,30 @@
                     <MenuItem Header="Exit" Command="{Binding ExitCommand}"/>
             </MenuItem>
             <MenuItem Header="Tools">
-                <MenuItem Header="Export" Command="{Binding ExportCommand}"/>
+                <MenuItem Header="Build" Command="{Binding BuildCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Window">
+                <MenuItem Header="Project preferences" Command="{Binding OpenProjectPreferencesCommand}"/>
+                <MenuItem Header="Output log" Command="{Binding OpenOutputLogCommand}"/>
             </MenuItem>
         </Menu>
-        <Grid VerticalAlignment="Stretch" Height="Auto" Margin="2">
+        <Grid x:Name="grid" VerticalAlignment="Stretch" Height="Auto" Margin="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="300"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
             <DockPanel Grid.Column="0" HorizontalAlignment="Stretch">
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                    <Button Width="20" Height="20" Margin="0,2,0,2" Click="Refresh_Click">
+                    <Button Width="20" Height="20" Margin="0,2,0,2" Click="Minimize_Click">
+                        <TextBlock x:Name="MinimizeTextBlock" Text="&lt;" FontSize="20" Foreground="Black" Margin="0,-8.1,0,0"/>
+                    </Button>
+                    <Button Width="20" Height="20" Margin="5,2,0,2" Click="Refresh_Click">
                         <Image Source="Images/RefreshIcon.png"/>
                     </Button>
                 </StackPanel>
                 <views:ContentBrowser x:Name="contentBrowser"/>
             </DockPanel>
-            <views:AssetView x:Name="assetView" Grid.Column="1" Margin="2,0,0,0"/>
+            <views:ViewNavigator x:Name="viewNavigator" Grid.Column="1" Margin="2,0,0,0"/>
         </Grid>
     </DockPanel>
 </Window>

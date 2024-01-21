@@ -47,7 +47,7 @@ namespace OrdealBuilder
                 foreach (var filePath in filePaths)
                 {
                     string extension = System.IO.Path.GetExtension(filePath);
-                    if(extension.Equals(".oda") || extension.Equals(".odapro"))
+                    if(extension.Equals(Project.GetProjectPreferences().ResourceExtension) || extension.Equals(Project.ProjectExtension))
                     {
                         continue;
                     }
@@ -104,6 +104,18 @@ namespace OrdealBuilder
             }
 
             return null;
+        }
+
+        public void UpdateProjectFilesExtension(string OldExtension, string NewExtension)
+        {
+            foreach (File file in files)
+            {
+                file.UpdateProjectFilesExtension(OldExtension, NewExtension);
+            }
+            foreach (Directory dir in directories)
+            {
+                dir.UpdateProjectFilesExtension(OldExtension, NewExtension);
+            }
         }
     }
 }

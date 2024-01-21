@@ -12,20 +12,22 @@ namespace OrdealBuilder
         public bool Modified { get; set; }
         public string? Name { get; }
         public string? OriginalPath { get; }
-        public string? Path { get; }
+        public string? Path { get; set; }
         public AssetType Type { get; }
+        public bool Loaded { get; private set; }
 
         public Asset(string path, AssetType type)
         {
+            Loaded = false;
             OriginalPath = path;
             Name = System.IO.Path.GetFileNameWithoutExtension(path);
-            Path = System.IO.Path.ChangeExtension(path, ".oda");
+            Path = System.IO.Path.ChangeExtension(path, Project.GetProjectPreferences().ResourceExtension);
             Type = type;
         }
 
         public virtual void Load()
         {
-
+            Loaded = true;
         }
 
         public virtual void Save()
@@ -35,7 +37,7 @@ namespace OrdealBuilder
 
         public virtual void Clear()
         {
-
+            Loaded = false;
         }
     }
 }

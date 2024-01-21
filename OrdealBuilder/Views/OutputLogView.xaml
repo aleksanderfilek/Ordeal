@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="OrdealBuilder.Views.OutputLogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OrdealBuilder.Views" xmlns:viewmodels="clr-namespace:OrdealBuilder.ViewModels" 
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button Content="Clear" Width="100" Margin="5,5,0,5" Click="Clear_Click"/>
+        </StackPanel>
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" local:ScrollViewerExtensions.AlwaysScrollToEnd="True">
+            <ItemsControl x:Name="MsgStack" Grid.Row="1" ItemsSource="{Binding MessageObjects}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="TextWrapping" Value="Wrap"/>
+                        <Setter Property="FontSize" Value="16"/>
+                    </Style>
+                </ItemsControl.Resources>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

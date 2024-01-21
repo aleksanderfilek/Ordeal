@@ -8,6 +8,7 @@ namespace OrdealBuilder.Commands
 {
     public class SaveAllCommand : CommandBase
     {
+
         public override void Execute(object? parameter)
         {
             Project.Get().SaveAll();

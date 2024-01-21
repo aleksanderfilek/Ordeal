@@ -22,9 +22,32 @@ namespace OrdealBuilder
 
         public void Save()
         {
-            if(Modified)
+            if(Modified && Asset.Loaded)
             {
                 Asset.Save();
+            }
+        }
+
+        public void UpdateProjectFilesExtension(string OldExtension, string NewExtension)
+        {
+            if(Type != AssetType.Invalid)
+            {
+                string OldFilePath = System.IO.Path.ChangeExtension(Path, OldExtension);
+                string NewFilePath = System.IO.Path.ChangeExtension(Path, NewExtension);
+                if (Asset != null && Asset.Path != null)
+                {
+                    Asset.Path = NewFilePath;
+                }
+
+                if (System.IO.File.Exists(OldFilePath))
+                {
+                    System.IO.File.Move(OldFilePath, NewFilePath);
+                    System.IO.File.Delete(OldFilePath);
+                }
+                else
+                {
+                    Save();
+                }
             }
         }
     }
